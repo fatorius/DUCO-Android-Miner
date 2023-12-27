@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="background_light">#fffeee</color>
+    <color name="background_dark">#121212</color>
+    <color name="white_accent">#fafafa</color>
+    <color name="orange_accent">#ff4112</color>
+    <color name="sun_yellow_accent">#ffb412</color>
+    <color name="magenta_accent">#f31291</color>
+    <color name="dark_accent">#121212</color>
+    <color name="font_color_light">#0f0f0f</color>
+    <color name="font_color_dark">#fffdee</color>
+</resources>

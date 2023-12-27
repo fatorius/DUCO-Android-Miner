@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">DuinoCoinMiner</string>
+    <string name="wallet_input_hint">Your username</string>
+    <string name="mining_key_input_hint">Mining key (optional)</string>
+    <string name="mining_threads_input_hint">Mining Threads</string>
+    <string name="mining_intensity_input_hint">Mining Intensity (0-100)</string>
+    <string name="credits">Created by fatorius</string>
+    <string name="start">Start</string>
+    <string name="mining_intensity_starting_value">95</string>
+</resources>

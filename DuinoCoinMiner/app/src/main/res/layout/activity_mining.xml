@@ -6,4 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".MiningActivity">
 
+    <FrameLayout
+        android:layout_width="308dp"
+        android:layout_height="430dp"
+        android:outlineProvider="none"
+        android:outlineSpotShadowColor="#000000"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/miningNodeDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp" />
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

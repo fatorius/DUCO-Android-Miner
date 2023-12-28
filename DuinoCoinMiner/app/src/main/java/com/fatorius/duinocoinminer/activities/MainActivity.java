@@ -1,4 +1,4 @@
-package com.fatorius.duinocoinminer;
+package com.fatorius.duinocoinminer.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 

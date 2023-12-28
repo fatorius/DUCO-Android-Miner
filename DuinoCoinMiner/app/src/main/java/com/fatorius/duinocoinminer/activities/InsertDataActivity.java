@@ -1,4 +1,4 @@
-package com.fatorius.duinocoinminer;
+package com.fatorius.duinocoinminer.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.fatorius.duinocoinminer.R;
 
 public class InsertDataActivity extends AppCompatActivity {
 
@@ -38,8 +40,8 @@ public class InsertDataActivity extends AppCompatActivity {
             public void onClick(View view) {
                 editor.putString("username_value", yourNameInput.getText().toString());
                 editor.putString("mining_key_value", miningKeyInput.getText().toString());
-                editor.putInt("threads_value", Integer.valueOf(miningThreadsInput.getText().toString()));
-                editor.putInt("mining_intensity_value", Integer.valueOf(miningIntensityBar.getProgress()));
+                editor.putInt("threads_value", Integer.parseInt(miningThreadsInput.getText().toString()));
+                editor.putInt("mining_intensity_value", miningIntensityBar.getProgress());
                 editor.putBoolean("isThereDataSaved", true);
 
                 startActivity(miningIntent);

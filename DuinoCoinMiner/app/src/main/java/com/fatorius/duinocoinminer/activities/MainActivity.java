@@ -8,6 +8,10 @@ import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
 
+    static {
+       System.loadLibrary("ducohasher");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

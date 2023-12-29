@@ -20,8 +20,6 @@ import com.fatorius.duinocoinminer.tcp.TcpCallback;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
-
 public class MiningActivity extends AppCompatActivity implements TcpCallback {
     RequestQueue requestQueue;
     JsonObjectRequest getMiningPool;

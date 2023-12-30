@@ -1,10 +1,14 @@
 package com.fatorius.duinocoinminer.tcp;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+
+// TODO update this to organize it better. connections must NOT close
 
 public class JobRequester implements Runnable{
     private final String ip;
@@ -22,6 +26,7 @@ public class JobRequester implements Runnable{
 
     @Override
     public void run() {
+        Log.d("Sending JOB request", "JOB," + ducoUsername + ",LOW");
         /*
         String responseLength;
         String responseData;
@@ -38,13 +43,18 @@ public class JobRequester implements Runnable{
         //32d87953f66baea4b3bb3e7fee68e27d6b12692d,2924aba17c470d457c3e9310b1fe34d58d32b820,25000
         responseData = socketReader.readLine();
 
+        Log.d("JOB received", responseData);
+
         socket.close();
         socketSender.close();
         socketReader.close();
         */
 
+
         String responseData = "32d87953f66baea4b3bb3e7fee68e27d6b12692d,2924aba17c470d457c3e9310b1fe34d58d32b820,25000";
         String[] values = responseData.split(",");
+
+        Log.d("JOB received", responseData);
 
         callback.onJobReceived(values[0], values[1], Integer.parseInt(values[2]));
     }

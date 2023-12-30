@@ -44,6 +44,8 @@ public class InsertDataActivity extends AppCompatActivity {
                 editor.putInt("mining_intensity_value", miningIntensityBar.getProgress());
                 editor.putBoolean("isThereDataSaved", true);
 
+                editor.apply();
+
                 startActivity(miningIntent);
             }
         });

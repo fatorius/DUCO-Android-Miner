@@ -4,12 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.fatorius.duinocoinminer.R;
@@ -18,7 +17,6 @@ import com.fatorius.duinocoinminer.tcp.JobRequester;
 import com.fatorius.duinocoinminer.tcp.TcpCallback;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MiningActivity extends AppCompatActivity implements TcpCallback {
     RequestQueue requestQueue;
@@ -46,33 +44,26 @@ public class MiningActivity extends AppCompatActivity implements TcpCallback {
 
         getMiningPool = new JsonObjectRequest(
                 Request.Method.GET, GET_MINING_POOL_URL, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            poolName = response.getString("name");
-                            poolIp = response.getString("ip");
-                            poolPort = response.getInt("port");
-                            poolServerName = response.getString("server");
-                        } catch (JSONException e) {
-                            // TODO HANDLE DEVICE WITH NO NETWORK CONNECTION
-                            throw new RuntimeException(e);
-                        }
 
-                        miningNodeDisplay.setText(new String("Mining on " + poolName));
-                        System.out.println(response.toString());
-
-                        Thread tcpThread = new Thread(new JobRequester(poolIp, poolPort, ducoUsername, miningActivity));
-
-                        tcpThread.start();
+                response -> {
+                    try {
+                        poolName = response.getString("name");
+                        poolIp = response.getString("ip");
+                        poolPort = response.getInt("port");
+                        poolServerName = response.getString("server");
+                    } catch (JSONException e) {
+                        // TODO HANDLE DEVICE WITH NO NETWORK CONNECTION
+                        throw new RuntimeException(e);
                     }
+
+                    String newMiningText = "Mining on " + poolName;
+                    miningNodeDisplay.setText(newMiningText);
+
+                    Thread tcpThread = new Thread(new JobRequester(poolIp, poolPort, ducoUsername, miningActivity));
+
+                    tcpThread.start();
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        System.out.println(error.toString());
-                    }
-                }
+                error -> System.out.println(error.toString())
         );
     }
 
@@ -109,10 +100,11 @@ public class MiningActivity extends AppCompatActivity implements TcpCallback {
 
     @Override
     public void onJobReceived(String lastBlockHash, String expectedHash, int difficulty) {
-        hasher.findNonce(lastBlockHash, expectedHash, difficulty, efficiency);
+        int nonce = hasher.mine(lastBlockHash, expectedHash, difficulty, efficiency);
 
-        System.out.println(lastBlockHash);
-        System.out.println(expectedHash);
-        System.out.println(difficulty);
+        float timeElapsed = hasher.getTimeElapsed();
+        float hashrate = hasher.getHashrate();
+
+        Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + " Hashrate: " + hashrate);
     }
 }

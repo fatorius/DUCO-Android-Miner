@@ -1,5 +1,6 @@
 package com.fatorius.duinocoinminer.threads;
 
+import android.os.Build;
 import android.util.Log;
 
 import com.fatorius.duinocoinminer.algorithms.DUCOS1Hasher;
@@ -34,43 +35,48 @@ public class MiningThread implements Runnable{
 
     @Override
     public void run() {
+        String responseData;
+
         try {
             tcpClient = new Client(ip, port);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        /*
-        String responseLength;
-        String responseData;
+        while (true){
+            tcpClient.send("JOB," + username + ",LOW");
 
-        tcpClient.send("JOB," + ducoUsername + ",LOW");
+            try {
+                responseData = tcpClient.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-        //3.0
-        responseLength = tcpClient.readLine();
+            Log.d("JOB received", responseData);
 
-        //32d87953f66baea4b3bb3e7fee68e27d6b12692d,2924aba17c470d457c3e9310b1fe34d58d32b820,25000
-        responseData = tcpClient.readLine();
+            String[] values = responseData.split(",");
 
-        */
+            String lastBlockHash = values[0];
+            String expectedHash = values[1];
 
-        String responseData = "32d87953f66baea4b3bb3e7fee68e27d6b12692d,2924aba17c470d457c3e9310b1fe34d58d32b820,25000";
-        Log.d("JOB received", responseData);
+            int difficulty = Integer.parseInt(values[2]);
 
-        String[] values = responseData.split(",");
+            int nonce = hasher.mine(lastBlockHash, expectedHash, difficulty, miningEfficiency);
 
-        String lastBlockHash = values[0];
-        String expectedHash = values[1];
+            float timeElapsed = hasher.getTimeElapsed();
+            float hashrate = hasher.getHashrate();
 
-        int difficulty = Integer.parseInt(values[2]);
+            Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + " Hashrate: " + (int) hashrate);
 
-        int nonce = hasher.mine(lastBlockHash, expectedHash, difficulty, miningEfficiency);
+            tcpClient.send(nonce + "," + (int) hashrate + ",Android Miner," + Build.MODEL);
 
-        float timeElapsed = hasher.getTimeElapsed();
-        float hashrate = hasher.getHashrate();
+            try {
+                System.out.println(tcpClient.readLine());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-        Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + " Hashrate: " + (int) hashrate);
-
-        uiThreadMethods.sendSomeData(nonce + " Time elapsed: " + timeElapsed + " Hashrate: " + (int) hashrate);
+            uiThreadMethods.sendSomeData(nonce + " Time elapsed: " + timeElapsed + " Hashrate: " + (int) hashrate);
+        }
     }
 }

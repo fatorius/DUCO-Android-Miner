@@ -18,6 +18,9 @@ public class Client {
 
         socketSender = new PrintWriter(socket.getOutputStream(), true);
         socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        send("PING");
+        socketReader.readLine();
     }
 
     public void send(String msg){

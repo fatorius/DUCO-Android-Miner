@@ -38,8 +38,8 @@ public class InsertDataActivity extends AppCompatActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editor.putString("username_value", yourNameInput.getText().toString());
-                editor.putString("mining_key_value", miningKeyInput.getText().toString());
+                editor.putString("username_value", yourNameInput.getText().toString().strip());
+                editor.putString("mining_key_value", miningKeyInput.getText().toString().strip());
                 editor.putInt("threads_value", Integer.parseInt(miningThreadsInput.getText().toString()));
                 editor.putInt("mining_intensity_value", miningIntensityBar.getProgress());
                 editor.putBoolean("isThereDataSaved", true);

@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -12,17 +11,19 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.fatorius.duinocoinminer.R;
-import com.fatorius.duinocoinminer.algorithms.DUCOS1Hasher;
-import com.fatorius.duinocoinminer.tcp.JobRequester;
-import com.fatorius.duinocoinminer.tcp.TcpCallback;
+import com.fatorius.duinocoinminer.threads.MiningThread;
+import com.fatorius.duinocoinminer.threads.UIThreadMethods;
 
 import org.json.JSONException;
 
-public class MiningActivity extends AppCompatActivity implements TcpCallback {
+import java.io.IOException;
+
+public class MiningActivity extends AppCompatActivity implements UIThreadMethods {
     RequestQueue requestQueue;
     JsonObjectRequest getMiningPool;
 
     TextView miningNodeDisplay;
+    TextView textToDisplay;
 
     String poolName;
     String poolIp;
@@ -34,14 +35,10 @@ public class MiningActivity extends AppCompatActivity implements TcpCallback {
 
     SharedPreferences sharedPreferences;
 
-    DUCOS1Hasher hasher;
-
     static String GET_MINING_POOL_URL = "https://server.duinocoin.com/getPool";
+
     public MiningActivity(){
         MiningActivity miningActivity = this;
-
-        hasher = new DUCOS1Hasher();
-
         getMiningPool = new JsonObjectRequest(
                 Request.Method.GET, GET_MINING_POOL_URL, null,
 
@@ -59,9 +56,15 @@ public class MiningActivity extends AppCompatActivity implements TcpCallback {
                     String newMiningText = "Mining on " + poolName;
                     miningNodeDisplay.setText(newMiningText);
 
-                    Thread tcpThread = new Thread(new JobRequester(poolIp, poolPort, ducoUsername, miningActivity));
+                    Thread miningThread;
 
-                    tcpThread.start();
+                    try {
+                        miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, miningActivity));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    miningThread.start();
                 },
                 error -> System.out.println(error.toString())
         );
@@ -73,38 +76,42 @@ public class MiningActivity extends AppCompatActivity implements TcpCallback {
         setContentView(R.layout.activity_mining);
 
         miningNodeDisplay = findViewById(R.id.miningNodeDisplay);
+        textToDisplay = findViewById(R.id.msgToReceive);
 
         sharedPreferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
         ducoUsername = sharedPreferences.getString("username_value", "---------------------");
 
         int miningIntensity = sharedPreferences.getInt("mining_intensity_value", 0);
-
-        if (miningIntensity >= 90){
-            efficiency = 0.005f;
-        }
-        else if (miningIntensity >= 70){
-            efficiency = 0.1f;
-        }
-        else if (miningIntensity >= 50){
-            efficiency = 0.8f;
-        }
-        else if (miningIntensity >= 30) {
-            efficiency = 1.8f;
-        }else{
-            efficiency = 3;
-        }
+        efficiency = calculateEfficiency(miningIntensity);
 
         requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(getMiningPool);
     }
 
+    static float calculateEfficiency(int eff){
+        if (eff >= 90){
+            return 0.005f;
+        }
+        else if (eff >= 70){
+            return  0.1f;
+        }
+        else if (eff >= 50){
+            return  0.8f;
+        }
+        else if (eff >= 30) {
+            return 1.8f;
+        }
+
+        return 3.0f;
+    }
+
     @Override
-    public void onJobReceived(String lastBlockHash, String expectedHash, int difficulty) {
-        int nonce = hasher.mine(lastBlockHash, expectedHash, difficulty, efficiency);
-
-        float timeElapsed = hasher.getTimeElapsed();
-        float hashrate = hasher.getHashrate();
-
-        Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + " Hashrate: " + hashrate);
+    public void sendSomeData(String msg) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textToDisplay.setText(msg);
+            }
+        });
     }
 }

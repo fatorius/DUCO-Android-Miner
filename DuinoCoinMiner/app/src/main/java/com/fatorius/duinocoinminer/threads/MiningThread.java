@@ -22,6 +22,8 @@ public class MiningThread implements Runnable{
 
     UIThreadMethods uiThreadMethods;
 
+    private String shareResult;
+
     public MiningThread(String ip, int port, String username, float miningEfficiency, UIThreadMethods uiThreadMethods) throws IOException {
         this.ip = ip;
         this.port = port;
@@ -66,17 +68,25 @@ public class MiningThread implements Runnable{
             float timeElapsed = hasher.getTimeElapsed();
             float hashrate = hasher.getHashrate();
 
-            Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + " Hashrate: " + (int) hashrate);
+            Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
+
+            uiThreadMethods.sendHashrate((int) hashrate);
+            uiThreadMethods.newShareSent();
+            uiThreadMethods.sendNewLineFromMiner("Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
 
             tcpClient.send(nonce + "," + (int) hashrate + ",Android Miner," + Build.MODEL);
 
             try {
-                System.out.println(tcpClient.readLine());
+                shareResult = tcpClient.readLine();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
 
-            uiThreadMethods.sendSomeData(nonce + " Time elapsed: " + timeElapsed + " Hashrate: " + (int) hashrate);
+            if (shareResult.contains("GOOD")){
+                uiThreadMethods.newShareAccepted();
+            }
+
+            Log.d("Share accepted", shareResult);
         }
     }
 }

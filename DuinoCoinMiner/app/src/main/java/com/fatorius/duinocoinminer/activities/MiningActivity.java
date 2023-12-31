@@ -3,7 +3,9 @@ package com.fatorius.duinocoinminer.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -17,13 +19,19 @@ import com.fatorius.duinocoinminer.threads.UIThreadMethods;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class MiningActivity extends AppCompatActivity implements UIThreadMethods {
     RequestQueue requestQueue;
     JsonObjectRequest getMiningPool;
 
     TextView miningNodeDisplay;
-    TextView textToDisplay;
+    TextView acceptedSharesTextDisplay;
+    TextView hashrateDisplay;
+    TextView miningLogsTextDisplay;
 
     String poolName;
     String poolIp;
@@ -33,12 +41,26 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
     String ducoUsername;
     float efficiency;
 
+    int sentShares;
+    int acceptedShares;
+
+    float acceptedPercetange;
+
+    List<String> minerLogLines;
+
     SharedPreferences sharedPreferences;
 
     static String GET_MINING_POOL_URL = "https://server.duinocoin.com/getPool";
 
     public MiningActivity(){
         MiningActivity miningActivity = this;
+
+        sentShares = 0;
+        acceptedShares = 0;
+        acceptedPercetange = 100.0f;
+
+        minerLogLines = new ArrayList<>();
+
         getMiningPool = new JsonObjectRequest(
                 Request.Method.GET, GET_MINING_POOL_URL, null,
 
@@ -53,7 +75,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                         throw new RuntimeException(e);
                     }
 
-                    String newMiningText = "Mining on " + poolName;
+                    String newMiningText = "Mining node: " + poolName;
                     miningNodeDisplay.setText(newMiningText);
 
                     Thread miningThread;
@@ -76,7 +98,9 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
         setContentView(R.layout.activity_mining);
 
         miningNodeDisplay = findViewById(R.id.miningNodeDisplay);
-        textToDisplay = findViewById(R.id.msgToReceive);
+        acceptedSharesTextDisplay = findViewById(R.id.acceptedSharesDisplay);
+        hashrateDisplay = findViewById(R.id.hashrateDisplayText);
+        miningLogsTextDisplay = findViewById(R.id.minerlogsMultiline);
 
         sharedPreferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
         ducoUsername = sharedPreferences.getString("username_value", "---------------------");
@@ -86,6 +110,75 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
         requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(getMiningPool);
+    }
+
+    @Override
+    public void newShareSent() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                sentShares++;
+                updatePercentage();
+            }
+        });
+    }
+
+    @Override
+    public void newShareAccepted() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                acceptedShares++;
+                updatePercentage();
+            }
+        });
+    }
+
+    @Override
+    public void sendHashrate(int hr) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hashrateDisplay.setText(convertHashrate(hr));
+            }
+        });
+    }
+
+    @Override
+    public void sendNewLineFromMiner(String line) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                long currentTimeMillis = System.currentTimeMillis();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                Date currentDate = new Date(currentTimeMillis);
+                String formattedDate = sdf.format(currentDate);
+
+                String newLine = formattedDate + " | " + line;
+                minerLogLines.add(0, newLine);
+
+                if (minerLogLines.size() > 8){
+                    minerLogLines.remove(8);
+                }
+
+                String newMultiLineText = "";
+
+                for (int i = 0; i < minerLogLines.size(); i++){
+                    newMultiLineText += minerLogLines.get(i) + "\n";
+                }
+
+                miningLogsTextDisplay.setText(newMultiLineText);
+            }
+        });
+    }
+
+    private void updatePercentage(){
+        acceptedPercetange = ((float) (acceptedShares / sentShares)) * 10000;
+        acceptedPercetange = Math.round(acceptedPercetange) / 100.0f;
+
+        String newText = "Accepted shares: " + acceptedShares + "/" + sentShares + " (" + acceptedPercetange + "%)";
+
+        acceptedSharesTextDisplay.setText(newText);
     }
 
     static float calculateEfficiency(int eff){
@@ -105,13 +198,21 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
         return 3.0f;
     }
 
-    @Override
-    public void sendSomeData(String msg) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                textToDisplay.setText(msg);
-            }
-        });
+    static String convertHashrate(int hr){
+        float roundedHashrate;
+
+        if (hr >= 1_000_000){
+            hr /= 1_000;
+            roundedHashrate = hr / 1_000.0f;
+
+            return roundedHashrate + "M";
+        }
+        else if (hr >= 1_000){
+            hr /= 100;
+            roundedHashrate = hr / 10.0f;
+            return roundedHashrate + "k";
+        }
+
+        return String.valueOf(hr);
     }
 }

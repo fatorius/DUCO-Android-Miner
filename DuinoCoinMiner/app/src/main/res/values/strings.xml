@@ -1,9 +1,16 @@
 <resources>
-    <string name="app_name">DuinoCoinMiner</string>
+    <string name="app_name">DuinoCoin Android Miner</string>
     <string name="wallet_input_hint">Your username</string>
     <string name="mining_key_input_hint">Mining key (optional)</string>
     <string name="mining_threads_input_hint">Mining Threads</string>
     <string name="mining_intensity_input_hint">Mining Intensity (0-100)</string>
+    <string name="happy_mining">Happy mining!</string>
+    <string name="stats">Stats</string>
+    <string name="hashrate_title">Hashrate</string>
+    <string name="hashrate_desc">Hashes per second</string>
+    <string name="mining_log_title">Miner logs</string>
+    <string name="mining_pool_placeholder">Mining node: Connecting</string>
+    <string name="accepted_shares_placeholder">Accepted shares: 0/0 (100%)</string>
     <string name="credits">Created by fatorius</string>
     <string name="start">Start</string>
     <string name="mining_intensity_starting_value">95</string>

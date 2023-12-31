@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
-import android.os.SystemClock;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -32,6 +32,8 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
     TextView acceptedSharesTextDisplay;
     TextView hashrateDisplay;
     TextView miningLogsTextDisplay;
+
+    Button stopMining;
 
     String poolName;
     String poolIp;
@@ -102,6 +104,18 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
         hashrateDisplay = findViewById(R.id.hashrateDisplayText);
         miningLogsTextDisplay = findViewById(R.id.minerlogsMultiline);
 
+        stopMining = findViewById(R.id.stopMiningButton);
+
+        stopMining.setOnClickListener(view -> {
+            // TODO CALL TCP SOCKET CONNECTION CLOSE
+
+            // TODO STOP ALL THREADS SOMEHOW
+
+            // TODO GO BACK TO PREVIOUS ACTIVITY
+
+            // TODO DELETE ALL SHARED PREFERENCES PREFERENCES
+        });
+
         sharedPreferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
         ducoUsername = sharedPreferences.getString("username_value", "---------------------");
 
@@ -114,61 +128,44 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
     @Override
     public void newShareSent() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                sentShares++;
-                updatePercentage();
-            }
-        });
+        runOnUiThread(() -> sentShares++);
     }
 
     @Override
     public void newShareAccepted() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                acceptedShares++;
-                updatePercentage();
-            }
+        runOnUiThread(() -> {
+            acceptedShares++;
+            updatePercentage();
         });
     }
 
     @Override
     public void sendHashrate(int hr) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                hashrateDisplay.setText(convertHashrate(hr));
-            }
-        });
+        runOnUiThread(() -> hashrateDisplay.setText(convertHashrate(hr)));
     }
 
     @Override
     public void sendNewLineFromMiner(String line) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                long currentTimeMillis = System.currentTimeMillis();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                Date currentDate = new Date(currentTimeMillis);
-                String formattedDate = sdf.format(currentDate);
+        runOnUiThread(() -> {
+            long currentTimeMillis = System.currentTimeMillis();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Date currentDate = new Date(currentTimeMillis);
+            String formattedDate = sdf.format(currentDate);
 
-                String newLine = formattedDate + " | " + line;
-                minerLogLines.add(0, newLine);
+            String newLine = formattedDate + " | " + line;
+            minerLogLines.add(0, newLine);
 
-                if (minerLogLines.size() > 8){
-                    minerLogLines.remove(8);
-                }
-
-                String newMultiLineText = "";
-
-                for (int i = 0; i < minerLogLines.size(); i++){
-                    newMultiLineText += minerLogLines.get(i) + "\n";
-                }
-
-                miningLogsTextDisplay.setText(newMultiLineText);
+            if (minerLogLines.size() > 8){
+                minerLogLines.remove(8);
             }
+
+            StringBuilder newMultiLineText = new StringBuilder();
+
+            for (int i = 0; i < minerLogLines.size(); i++){
+                newMultiLineText.append(minerLogLines.get(i)).append("\n");
+            }
+
+            miningLogsTextDisplay.setText(newMultiLineText.toString());
         });
     }
 

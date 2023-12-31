@@ -22,8 +22,6 @@ public class MiningThread implements Runnable{
 
     UIThreadMethods uiThreadMethods;
 
-    private String shareResult;
-
     public MiningThread(String ip, int port, String username, float miningEfficiency, UIThreadMethods uiThreadMethods) throws IOException {
         this.ip = ip;
         this.port = port;
@@ -76,6 +74,7 @@ public class MiningThread implements Runnable{
 
             tcpClient.send(nonce + "," + (int) hashrate + ",Android Miner," + Build.MODEL);
 
+            String shareResult;
             try {
                 shareResult = tcpClient.readLine();
             } catch (IOException e) {

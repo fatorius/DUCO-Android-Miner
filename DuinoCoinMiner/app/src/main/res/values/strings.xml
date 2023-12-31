@@ -13,5 +13,6 @@
     <string name="accepted_shares_placeholder">Accepted shares: 0/0 (100%)</string>
     <string name="credits">Created by fatorius</string>
     <string name="start">Start</string>
+    <string name="stop_mining_button">Stop mining</string>
     <string name="mining_intensity_starting_value">95</string>
 </resources>

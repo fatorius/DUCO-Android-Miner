@@ -281,6 +281,4 @@ class SHA1{
         }
 };
 
-
-
 #endif //DUINOCOINMINER_SHA1_H

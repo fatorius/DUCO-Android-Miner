@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
@@ -25,29 +24,26 @@ public class InsertDataActivity extends AppCompatActivity {
 
         Intent miningIntent = new Intent(this, MiningActivity.class);
 
-        Button startButton = (Button) findViewById(R.id.startButton);
+        Button startButton = findViewById(R.id.startButton);
 
-        EditText yourNameInput = (EditText) findViewById(R.id.yourNameInput);
-        EditText miningKeyInput = (EditText) findViewById(R.id.miningKeyInput);
-        EditText miningThreadsInput = (EditText) findViewById(R.id.miningThreadsInput);
+        EditText yourNameInput = findViewById(R.id.yourNameInput);
+        EditText miningKeyInput = findViewById(R.id.miningKeyInput);
+        EditText miningThreadsInput = findViewById(R.id.miningThreadsInput);
 
-        TextView intensityDisplay = (TextView) findViewById(R.id.intensityDisplay);
+        TextView intensityDisplay = findViewById(R.id.intensityDisplay);
 
-        SeekBar miningIntensityBar = (SeekBar) findViewById(R.id.miningIntensityInput);
+        SeekBar miningIntensityBar = findViewById(R.id.miningIntensityInput);
 
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                editor.putString("username_value", yourNameInput.getText().toString().strip());
-                editor.putString("mining_key_value", miningKeyInput.getText().toString().strip());
-                editor.putInt("threads_value", Integer.parseInt(miningThreadsInput.getText().toString()));
-                editor.putInt("mining_intensity_value", miningIntensityBar.getProgress());
-                editor.putBoolean("isThereDataSaved", true);
+        startButton.setOnClickListener(view -> {
+            editor.putString("username_value", yourNameInput.getText().toString().strip());
+            editor.putString("mining_key_value", miningKeyInput.getText().toString().strip());
+            editor.putInt("threads_value", Integer.parseInt(miningThreadsInput.getText().toString()));
+            editor.putInt("mining_intensity_value", miningIntensityBar.getProgress());
+            editor.putBoolean("isThereDataSaved", true);
 
-                editor.apply();
+            editor.apply();
 
-                startActivity(miningIntent);
-            }
+            startActivity(miningIntent);
         });
 
         miningIntensityBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

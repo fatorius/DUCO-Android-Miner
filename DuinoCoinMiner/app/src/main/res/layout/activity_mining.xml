@@ -124,6 +124,13 @@
                 android:textAllCaps="false"
                 android:textSize="10sp" />
 
+            <ProgressBar
+                android:id="@+id/gettingPoolLoading"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="167dp"
+                android:visibility="visible" />
+
         </LinearLayout>
 
     </LinearLayout>

@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -37,6 +39,8 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
     Button stopMining;
 
+    ProgressBar gettingPoolProgress;
+
     String poolName;
     String poolIp;
     int poolPort;
@@ -44,6 +48,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
     String ducoUsername;
     float efficiency;
+    int numberOfMiningThreads;
 
     int sentShares;
     int acceptedShares;
@@ -51,6 +56,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
     float acceptedPercetange;
 
     List<String> minerLogLines;
+    List<Thread> miningThreads;
 
     SharedPreferences sharedPreferences;
 
@@ -69,6 +75,8 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                 Request.Method.GET, GET_MINING_POOL_URL, null,
 
                 response -> {
+                    gettingPoolProgress.setVisibility(View.GONE);
+
                     try {
                         poolName = response.getString("name");
                         poolIp = response.getString("ip");
@@ -81,21 +89,30 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                     String newMiningText = "Mining node: " + poolName;
                     miningNodeDisplay.setText(newMiningText);
 
-                    Thread miningThread;
+                    miningThreads = new ArrayList<>();
 
-                    try {
-                        miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, miningActivity));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    for (int t = 0; t < numberOfMiningThreads; t++){
+                        Thread miningThread;
+
+                        try {
+                            miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, miningActivity, t));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        miningThreads.add(miningThread);
                     }
 
-                    miningThread.start();
+                    for (int t = 0; t < numberOfMiningThreads; t++){
+                        miningThreads.get(t).start();
+                    }
 
                     stopMining.setOnClickListener(view -> {
-                        miningThread.interrupt();
+                        for (int t = 0; t < numberOfMiningThreads; t++){
+                            miningThreads.get(t).interrupt();
+                        }
 
-                        SharedPreferences preferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = preferences.edit();
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.clear();
                         editor.apply();
 
@@ -104,6 +121,8 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                 },
 
                 error -> {
+                    gettingPoolProgress.setVisibility(View.GONE);
+
                     String errorMsg = "Fail getting mining node";
 
                     String errorType = error.toString();
@@ -114,9 +133,14 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                             break;
                         case "com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"server.duinocoin.com\": No address associated with hostname":
                             errorMsg = "Error: no internet connection";
+                            break;
+                        case "com.android.volley.ServerError":
+                            errorMsg = "Error: server.duinocoin.com internal error";
+                            break;
                     }
 
-                    Log.d("Resquest error", error.toString());
+                    Log.i("Resquest error", error.toString());
+
                     miningNodeDisplay.setText(errorMsg);
                 }
         );
@@ -134,10 +158,14 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
         stopMining = findViewById(R.id.stopMiningButton);
 
+        gettingPoolProgress = findViewById(R.id.gettingPoolLoading);
+
         sharedPreferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
         ducoUsername = sharedPreferences.getString("username_value", "---------------------");
+        numberOfMiningThreads = sharedPreferences.getInt("threads_value", 1);
 
         int miningIntensity = sharedPreferences.getInt("mining_intensity_value", 0);
+
         efficiency = calculateEfficiency(miningIntensity);
 
         requestQueue = Volley.newRequestQueue(this);

@@ -12,6 +12,8 @@ public class MiningThread implements Runnable{
     String ip;
     int port;
 
+    int threadNo;
+
     Client tcpClient;
 
     String username;
@@ -22,19 +24,26 @@ public class MiningThread implements Runnable{
 
     UIThreadMethods uiThreadMethods;
 
-    public MiningThread(String ip, int port, String username, float miningEfficiency, UIThreadMethods uiThreadMethods) throws IOException {
+    public MiningThread(String ip, int port, String username, float miningEfficiency,
+                        UIThreadMethods uiThreadMethods, int threadNo) throws IOException {
         this.ip = ip;
         this.port = port;
         this.username = username;
         this.miningEfficiency = miningEfficiency;
 
+        this.threadNo = threadNo;
+
         this.uiThreadMethods = uiThreadMethods;
 
         hasher = new DUCOS1Hasher();
+
+        Log.d("Mining thread" + threadNo, threadNo + " created");
     }
 
     @Override
     public void run() {
+        Log.d("Mining thread" + threadNo, threadNo + " started");
+
         try {
             String responseData;
 
@@ -53,7 +62,7 @@ public class MiningThread implements Runnable{
                     throw new RuntimeException(e);
                 }
 
-                Log.d("JOB received", responseData);
+                Log.d("Thread " + threadNo + " | JOB received", responseData);
 
                 String[] values = responseData.split(",");
 
@@ -67,11 +76,11 @@ public class MiningThread implements Runnable{
                 float timeElapsed = hasher.getTimeElapsed();
                 float hashrate = hasher.getHashrate();
 
-                Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
+                Log.d("Thread " + threadNo + " | Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
 
                 uiThreadMethods.sendHashrate((int) hashrate);
                 uiThreadMethods.newShareSent();
-                uiThreadMethods.sendNewLineFromMiner("Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
+                uiThreadMethods.sendNewLineFromMiner("Thread " + threadNo + " | Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
 
                 tcpClient.send(nonce + "," + (int) hashrate + ",Android Miner," + Build.MODEL);
 
@@ -95,8 +104,9 @@ public class MiningThread implements Runnable{
         finally {
             try {
                 tcpClient.closeConnection();
+                Log.d("Mining thread" + threadNo, threadNo + " interrupted");
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Log.w("Miner thread", "Couldn't properly end socket connection");
             }
         }
     }

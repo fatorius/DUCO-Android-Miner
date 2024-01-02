@@ -35,57 +35,69 @@ public class MiningThread implements Runnable{
 
     @Override
     public void run() {
-        String responseData;
-
         try {
-            tcpClient = new Client(ip, port);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            String responseData;
+
+            try {
+                tcpClient = new Client(ip, port);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            while (true) {
+                tcpClient.send("JOB," + username + ",LOW");
+
+                try {
+                    responseData = tcpClient.readLine();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                Log.d("JOB received", responseData);
+
+                String[] values = responseData.split(",");
+
+                String lastBlockHash = values[0];
+                String expectedHash = values[1];
+
+                int difficulty = Integer.parseInt(values[2]);
+
+                int nonce = hasher.mine(lastBlockHash, expectedHash, difficulty, miningEfficiency);
+
+                float timeElapsed = hasher.getTimeElapsed();
+                float hashrate = hasher.getHashrate();
+
+                Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
+
+                uiThreadMethods.sendHashrate((int) hashrate);
+                uiThreadMethods.newShareSent();
+                uiThreadMethods.sendNewLineFromMiner("Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
+
+                tcpClient.send(nonce + "," + (int) hashrate + ",Android Miner," + Build.MODEL);
+
+                String shareResult;
+                try {
+                    shareResult = tcpClient.readLine();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (shareResult.contains("GOOD")) {
+                    uiThreadMethods.newShareAccepted();
+                }
+
+                Log.d("Share accepted", shareResult);
+            }
         }
-
-        while (true){
-            tcpClient.send("JOB," + username + ",LOW");
-
+        catch (RuntimeException e){
+            e.printStackTrace();
+        }
+        finally {
             try {
-                responseData = tcpClient.readLine();
+                tcpClient.closeConnection();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
-            Log.d("JOB received", responseData);
-
-            String[] values = responseData.split(",");
-
-            String lastBlockHash = values[0];
-            String expectedHash = values[1];
-
-            int difficulty = Integer.parseInt(values[2]);
-
-            int nonce = hasher.mine(lastBlockHash, expectedHash, difficulty, miningEfficiency);
-
-            float timeElapsed = hasher.getTimeElapsed();
-            float hashrate = hasher.getHashrate();
-
-            Log.d("Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
-
-            uiThreadMethods.sendHashrate((int) hashrate);
-            uiThreadMethods.newShareSent();
-            uiThreadMethods.sendNewLineFromMiner("Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
-
-            tcpClient.send(nonce + "," + (int) hashrate + ",Android Miner," + Build.MODEL);
-
-            String shareResult;
-            try {
-                shareResult = tcpClient.readLine();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            if (shareResult.contains("GOOD")){
-                uiThreadMethods.newShareAccepted();
-            }
-
-            Log.d("Share accepted", shareResult);
         }
     }
 }

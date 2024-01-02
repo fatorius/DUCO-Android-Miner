@@ -5,11 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.TimeoutError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.fatorius.duinocoinminer.R;
@@ -26,7 +28,7 @@ import java.util.Locale;
 
 public class MiningActivity extends AppCompatActivity implements UIThreadMethods {
     RequestQueue requestQueue;
-    JsonObjectRequest getMiningPool;
+    JsonObjectRequest getMiningPoolRequester;
 
     TextView miningNodeDisplay;
     TextView acceptedSharesTextDisplay;
@@ -63,7 +65,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
         minerLogLines = new ArrayList<>();
 
-        getMiningPool = new JsonObjectRequest(
+        getMiningPoolRequester = new JsonObjectRequest(
                 Request.Method.GET, GET_MINING_POOL_URL, null,
 
                 response -> {
@@ -73,7 +75,6 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                         poolPort = response.getInt("port");
                         poolServerName = response.getString("server");
                     } catch (JSONException e) {
-                        // TODO HANDLE DEVICE WITH NO NETWORK CONNECTION
                         throw new RuntimeException(e);
                     }
 
@@ -89,8 +90,35 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                     }
 
                     miningThread.start();
+
+                    stopMining.setOnClickListener(view -> {
+                        miningThread.interrupt();
+
+                        SharedPreferences preferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.clear();
+                        editor.apply();
+
+                        finish();
+                    });
                 },
-                error -> System.out.println(error.toString())
+
+                error -> {
+                    String errorMsg = "Fail getting mining node";
+
+                    String errorType = error.toString();
+
+                    switch (errorType){
+                        case "com.android.volley.TimeoutError":
+                            errorMsg = "Error: Timeout connecting to server.duinocoin.com";
+                            break;
+                        case "com.android.volley.NoConnectionError: java.net.UnknownHostException: Unable to resolve host \"server.duinocoin.com\": No address associated with hostname":
+                            errorMsg = "Error: no internet connection";
+                    }
+
+                    Log.d("Resquest error", error.toString());
+                    miningNodeDisplay.setText(errorMsg);
+                }
         );
     }
 
@@ -106,16 +134,6 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
         stopMining = findViewById(R.id.stopMiningButton);
 
-        stopMining.setOnClickListener(view -> {
-            // TODO CALL TCP SOCKET CONNECTION CLOSE
-
-            // TODO STOP ALL THREADS SOMEHOW
-
-            // TODO GO BACK TO PREVIOUS ACTIVITY
-
-            // TODO DELETE ALL SHARED PREFERENCES PREFERENCES
-        });
-
         sharedPreferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
         ducoUsername = sharedPreferences.getString("username_value", "---------------------");
 
@@ -123,7 +141,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
         efficiency = calculateEfficiency(miningIntensity);
 
         requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(getMiningPool);
+        requestQueue.add(getMiningPoolRequester);
     }
 
     @Override

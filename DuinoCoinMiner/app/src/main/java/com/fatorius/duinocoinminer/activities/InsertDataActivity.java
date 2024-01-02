@@ -31,7 +31,7 @@ public class InsertDataActivity extends AppCompatActivity {
         EditText miningKeyInput = findViewById(R.id.miningKeyInput);
         EditText miningThreadsInput = findViewById(R.id.miningThreadsInput);
 
-        miningThreadsInput.setHint("Mining threads (Recommended: " + HardwareStats.getNumberOfCPUCores() + ")");
+        miningThreadsInput.setHint("Mining threads (Max recommended: " + HardwareStats.getNumberOfCPUCores() + ")");
 
         TextView intensityDisplay = findViewById(R.id.intensityDisplay);
 

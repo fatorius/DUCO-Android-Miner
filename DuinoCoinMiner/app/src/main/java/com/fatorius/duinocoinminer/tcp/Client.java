@@ -19,6 +19,8 @@ public class Client {
         socketSender = new PrintWriter(socket.getOutputStream(), true);
         socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+        Log.d("Socket connection", "TCP connection started to " + ip + ":" + port);
+
         send("PING");
         socketReader.readLine();
     }
@@ -40,5 +42,7 @@ public class Client {
         socket.close();
         socketSender.close();
         socketReader.close();
+
+        Log.d("Socket connection ended", "Connection exit");
     }
 }

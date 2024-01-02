@@ -7,6 +7,7 @@
     <string name="happy_mining">Happy mining!</string>
     <string name="stats">Stats</string>
     <string name="hashrate_title">Hashrate</string>
+    <string name="hashrate_placeholder">0.0</string>
     <string name="hashrate_desc">Hashes per second</string>
     <string name="mining_log_title">Miner logs</string>
     <string name="mining_pool_placeholder">Mining node: Connecting</string>

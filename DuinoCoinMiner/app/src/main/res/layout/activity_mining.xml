@@ -91,6 +91,7 @@
                 android:id="@+id/hashrateDisplayText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="@string/hashrate_placeholder"
                 android:textAlignment="center"
                 android:textSize="34sp" />
 

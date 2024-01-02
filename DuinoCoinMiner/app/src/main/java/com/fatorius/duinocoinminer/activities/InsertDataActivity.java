@@ -14,6 +14,9 @@ import com.fatorius.duinocoinminer.R;
 import com.fatorius.duinocoinminer.infos.HardwareStats;
 
 public class InsertDataActivity extends AppCompatActivity {
+    static {
+        System.loadLibrary("cpuinfo");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

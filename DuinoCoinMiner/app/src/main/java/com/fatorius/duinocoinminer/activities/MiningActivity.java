@@ -2,6 +2,8 @@ package com.fatorius.duinocoinminer.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Notification;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.fatorius.duinocoinminer.R;
+import com.fatorius.duinocoinminer.services.MinerBackgroundService;
 import com.fatorius.duinocoinminer.threads.MiningThread;
 import com.fatorius.duinocoinminer.threads.UIThreadMethods;
 
@@ -28,7 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MiningActivity extends AppCompatActivity implements UIThreadMethods {
+public class MiningActivity extends AppCompatActivity { //implements UIThreadMethods {
     RequestQueue requestQueue;
     JsonObjectRequest getMiningPoolRequester;
 
@@ -57,8 +60,6 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
     float acceptedPercetange;
 
     List<String> minerLogLines;
-    List<Thread> miningThreads;
-    List<Integer> threadsHashrate;
 
     SharedPreferences sharedPreferences;
 
@@ -91,30 +92,18 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                     String newMiningText = "Mining node: " + poolName;
                     miningNodeDisplay.setText(newMiningText);
 
-                    miningThreads = new ArrayList<>();
-                    threadsHashrate = new ArrayList<>();
+                    Intent miningServiceIntent = new Intent(miningActivity, MinerBackgroundService.class);
 
-                    for (int t = 0; t < numberOfMiningThreads; t++){
-                        Thread miningThread;
+                    miningServiceIntent.putExtra("poolIp", poolIp);
+                    miningServiceIntent.putExtra("numberOfThreads", numberOfMiningThreads);
+                    miningServiceIntent.putExtra("poolPort", poolPort);
+                    miningServiceIntent.putExtra("ducoUsername", ducoUsername);
+                    miningServiceIntent.putExtra("efficiency", efficiency);
 
-                        try {
-                            miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, miningActivity, t));
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                        miningThreads.add(miningThread);
-                    }
-
-                    for (int t = 0; t < numberOfMiningThreads; t++){
-                        miningThreads.get(t).start();
-                        threadsHashrate.add(0);
-                    }
+                    miningActivity.startForegroundService(miningServiceIntent);
 
                     stopMining.setOnClickListener(view -> {
-                        for (int t = 0; t < numberOfMiningThreads; t++){
-                            miningThreads.get(t).interrupt();
-                        }
+                        miningActivity.stopService(miningServiceIntent);
 
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.clear();
@@ -185,6 +174,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
         requestQueue.add(getMiningPoolRequester);
     }
 
+    /*
     @Override
     public void newShareSent() {
         runOnUiThread(() -> sentShares++);
@@ -242,7 +232,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
             miningLogsTextDisplay.setText(newMultiLineText.toString());
         });
-    }
+    }*/
 
     private void updatePercentage(){
         acceptedPercetange = ((float) (acceptedShares / sentShares)) * 10000;

@@ -7,11 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
-    static {
-       System.loadLibrary("ducohasher");
-       System.loadLibrary("cpuinfo");
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

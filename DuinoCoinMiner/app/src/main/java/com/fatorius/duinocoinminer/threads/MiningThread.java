@@ -10,6 +10,10 @@ import com.fatorius.duinocoinminer.tcp.Client;
 import java.io.IOException;
 
 public class MiningThread implements Runnable{
+    static{
+        System.loadLibrary("ducohasher");
+    }
+
     String ip;
     int port;
 
@@ -23,10 +27,9 @@ public class MiningThread implements Runnable{
 
     float miningEfficiency;
 
-    UIThreadMethods uiThreadMethods;
+    //UIThreadMethods uiThreadMethods;
 
-    public MiningThread(String ip, int port, String username, float miningEfficiency,
-                        UIThreadMethods uiThreadMethods, int threadNo) throws IOException {
+    public MiningThread(String ip, int port, String username, float miningEfficiency, int threadNo) throws IOException {
         this.ip = ip;
         this.port = port;
         this.username = username;
@@ -34,7 +37,7 @@ public class MiningThread implements Runnable{
 
         this.threadNo = threadNo;
 
-        this.uiThreadMethods = uiThreadMethods;
+        //this.uiThreadMethods = uiThreadMethods;
 
         hasher = new DUCOS1Hasher();
 
@@ -79,9 +82,9 @@ public class MiningThread implements Runnable{
 
                 Log.d("Thread " + threadNo + " | Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
 
-                uiThreadMethods.sendHashrate(threadNo, (int) hashrate);
-                uiThreadMethods.newShareSent();
-                uiThreadMethods.sendNewLineFromMiner("Thread " + threadNo + " | Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
+                //uiThreadMethods.sendHashrate(threadNo, (int) hashrate);
+                //uiThreadMethods.newShareSent();
+                //uiThreadMethods.sendNewLineFromMiner("Thread " + threadNo + " | Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
 
                 tcpClient.send(nonce + "," + (int) hashrate + "," + MinerInfo.MINER_NAME + "," + Build.MODEL);
 
@@ -93,7 +96,7 @@ public class MiningThread implements Runnable{
                 }
 
                 if (shareResult.contains("GOOD")) {
-                    uiThreadMethods.newShareAccepted();
+                    //uiThreadMethods.newShareAccepted();
                 }
 
                 Log.d("Share accepted", shareResult);
@@ -105,7 +108,7 @@ public class MiningThread implements Runnable{
         finally {
             try {
                 tcpClient.closeConnection();
-                Log.d("Mining thread" + threadNo, threadNo + " interrupted");
+                Log.d("Mining thread " + threadNo, "Thread " + threadNo + " interrupted");
             } catch (IOException e) {
                 Log.w("Miner thread", "Couldn't properly end socket connection");
             }

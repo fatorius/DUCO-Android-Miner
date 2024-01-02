@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.TimeoutError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.fatorius.duinocoinminer.R;
@@ -27,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MiningActivity extends AppCompatActivity implements UIThreadMethods {
     RequestQueue requestQueue;
@@ -36,6 +36,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
     TextView acceptedSharesTextDisplay;
     TextView hashrateDisplay;
     TextView miningLogsTextDisplay;
+    TextView performancePerThread;
 
     Button stopMining;
 
@@ -57,6 +58,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
     List<String> minerLogLines;
     List<Thread> miningThreads;
+    List<Integer> threadsHashrate;
 
     SharedPreferences sharedPreferences;
 
@@ -90,6 +92,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                     miningNodeDisplay.setText(newMiningText);
 
                     miningThreads = new ArrayList<>();
+                    threadsHashrate = new ArrayList<>();
 
                     for (int t = 0; t < numberOfMiningThreads; t++){
                         Thread miningThread;
@@ -105,6 +108,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
 
                     for (int t = 0; t < numberOfMiningThreads; t++){
                         miningThreads.get(t).start();
+                        threadsHashrate.add(0);
                     }
 
                     stopMining.setOnClickListener(view -> {
@@ -142,6 +146,14 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
                     Log.i("Resquest error", error.toString());
 
                     miningNodeDisplay.setText(errorMsg);
+
+                    stopMining.setOnClickListener(view -> {
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.clear();
+                        editor.apply();
+
+                        finish();
+                    });
                 }
         );
     }
@@ -155,6 +167,7 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
         acceptedSharesTextDisplay = findViewById(R.id.acceptedSharesDisplay);
         hashrateDisplay = findViewById(R.id.hashrateDisplayText);
         miningLogsTextDisplay = findViewById(R.id.minerlogsMultiline);
+        performancePerThread = findViewById(R.id.threadPerformanceView);
 
         stopMining = findViewById(R.id.stopMiningButton);
 
@@ -186,8 +199,24 @@ public class MiningActivity extends AppCompatActivity implements UIThreadMethods
     }
 
     @Override
-    public void sendHashrate(int hr) {
-        runOnUiThread(() -> hashrateDisplay.setText(convertHashrate(hr)));
+    public void sendHashrate(int threadNo, int hr) {
+        runOnUiThread(() -> {
+            threadsHashrate.add(threadNo, hr);
+
+            int totalHashrate = 0;
+            StringBuilder displayHashratePerThread = new StringBuilder();
+
+            int threadHs;
+
+            for (int th = 0; th < numberOfMiningThreads; th++){
+                threadHs = threadsHashrate.get(th);
+                totalHashrate += threadHs;
+                displayHashratePerThread.append("Thread ").append(th).append(": ").append(threadHs).append("h/s \n");
+            }
+
+            hashrateDisplay.setText(convertHashrate(totalHashrate));
+            performancePerThread.setText(displayHashratePerThread.toString());
+        });
     }
 
     @Override

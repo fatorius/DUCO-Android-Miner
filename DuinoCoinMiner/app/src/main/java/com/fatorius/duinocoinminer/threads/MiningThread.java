@@ -4,6 +4,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.fatorius.duinocoinminer.algorithms.DUCOS1Hasher;
+import com.fatorius.duinocoinminer.infos.MinerInfo;
 import com.fatorius.duinocoinminer.tcp.Client;
 
 import java.io.IOException;
@@ -78,11 +79,11 @@ public class MiningThread implements Runnable{
 
                 Log.d("Thread " + threadNo + " | Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
 
-                uiThreadMethods.sendHashrate((int) hashrate);
+                uiThreadMethods.sendHashrate(threadNo, (int) hashrate);
                 uiThreadMethods.newShareSent();
                 uiThreadMethods.sendNewLineFromMiner("Thread " + threadNo + " | Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
 
-                tcpClient.send(nonce + "," + (int) hashrate + ",Android Miner," + Build.MODEL);
+                tcpClient.send(nonce + "," + (int) hashrate + "," + MinerInfo.MINER_NAME + "," + Build.MODEL);
 
                 String shareResult;
                 try {

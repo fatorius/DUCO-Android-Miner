@@ -1,5 +1,7 @@
 #include "jni.h"
 
+#include "sha1.h"
+
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -7,8 +9,6 @@
 #include <vector>
 #include <thread>
 #include <chrono>
-
-#include "sha1.h"
 
 extern "C"
 JNIEXPORT int JNICALL
@@ -26,7 +26,7 @@ Java_com_fatorius_duinocoinminer_algorithms_DUCOS1Hasher_findNonce(JNIEnv *env, 
     SHA1 hasher;
     hasher.update(last_hash);
 
-    for (int nonce = 0; nonce <= (100 * mining_difficulty); nonce++){
+    for (long nonce = 0; nonce <= (100 * mining_difficulty); nonce++){
         SHA1 temp_hasher = hasher.copy();
         temp_hasher.update(std::to_string(nonce));
         const std::string result = temp_hasher.final();

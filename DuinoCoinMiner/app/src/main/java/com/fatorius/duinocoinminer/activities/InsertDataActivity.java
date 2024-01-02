@@ -11,6 +11,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.fatorius.duinocoinminer.R;
+import com.fatorius.duinocoinminer.infos.HardwareStats;
 
 public class InsertDataActivity extends AppCompatActivity {
 
@@ -29,6 +30,8 @@ public class InsertDataActivity extends AppCompatActivity {
         EditText yourNameInput = findViewById(R.id.yourNameInput);
         EditText miningKeyInput = findViewById(R.id.miningKeyInput);
         EditText miningThreadsInput = findViewById(R.id.miningThreadsInput);
+
+        miningThreadsInput.setHint("Mining threads (Recommended: " + HardwareStats.getNumberOfCPUCores() + ")");
 
         TextView intensityDisplay = findViewById(R.id.intensityDisplay);
 

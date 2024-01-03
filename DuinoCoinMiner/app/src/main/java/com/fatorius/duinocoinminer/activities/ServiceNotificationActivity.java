@@ -1,7 +1,6 @@
 package com.fatorius.duinocoinminer.activities;
 
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +13,6 @@ public class ServiceNotificationActivity extends AppCompatActivity {
     }
 
     private void handleNotificationAction(){
-        Toast.makeText(this, "Butao", Toast.LENGTH_LONG).show();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 }

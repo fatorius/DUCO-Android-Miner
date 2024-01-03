@@ -29,15 +29,15 @@ public class MiningThread implements Runnable{
 
     //UIThreadMethods uiThreadMethods;
 
-    public MiningThread(String ip, int port, String username, float miningEfficiency, int threadNo) throws IOException {
+    ServiceCommunicationMethods service;
+
+    public MiningThread(String ip, int port, String username, float miningEfficiency, int threadNo, ServiceCommunicationMethods service) throws IOException {
         this.ip = ip;
         this.port = port;
         this.username = username;
         this.miningEfficiency = miningEfficiency;
-
+        this.service = service;
         this.threadNo = threadNo;
-
-        //this.uiThreadMethods = uiThreadMethods;
 
         hasher = new DUCOS1Hasher();
 
@@ -83,7 +83,7 @@ public class MiningThread implements Runnable{
                 Log.d("Thread " + threadNo + " | Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
 
                 //uiThreadMethods.sendHashrate(threadNo, (int) hashrate);
-                //uiThreadMethods.newShareSent();
+                service.newShareSent();
                 //uiThreadMethods.sendNewLineFromMiner("Thread " + threadNo + " | Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
 
                 tcpClient.send(nonce + "," + (int) hashrate + "," + MinerInfo.MINER_NAME + "," + Build.MODEL);
@@ -96,7 +96,7 @@ public class MiningThread implements Runnable{
                 }
 
                 if (shareResult.contains("GOOD")) {
-                    //uiThreadMethods.newShareAccepted();
+                    service.newShareAccepted();
                 }
 
                 Log.d("Share accepted", shareResult);

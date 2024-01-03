@@ -14,16 +14,18 @@ import android.os.PowerManager;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.fatorius.duinocoinminer.R;
 import com.fatorius.duinocoinminer.activities.ServiceNotificationActivity;
 import com.fatorius.duinocoinminer.threads.MiningThread;
+import com.fatorius.duinocoinminer.threads.ServiceCommunicationMethods;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MinerBackgroundService extends Service {
+public class MinerBackgroundService extends Service implements ServiceCommunicationMethods {
     private PowerManager.WakeLock wakeLock;
 
     List<Thread> miningThreads;
@@ -31,15 +33,24 @@ public class MinerBackgroundService extends Service {
 
     int numberOfMiningThreads;
 
+    int sentShares = 0;
+    int acceptedShares = 0;
+
+    float acceptedPercentage = 0.0f;
+
+
+    NotificationChannel channel;
+    PendingIntent pendingIntent;
+
     private static final int NOTIFICATION_ID = 1;
 
     @Override
     public void onCreate(){
         super.onCreate();
-        NotificationChannel channel = new NotificationChannel(
+        channel = new NotificationChannel(
                 "duinoCoinAndroidMinerChannel",
                 "MinerServicesNotification",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_MIN
         );
 
         getSystemService(NotificationManager.class).createNotificationChannel(channel);
@@ -50,12 +61,9 @@ public class MinerBackgroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DuinoCoinMiner::MinerServiceWaveLock");
         wakeLock.acquire();
-
 
         String poolIp = intent.getStringExtra("poolIp");
         String ducoUsername = intent.getStringExtra("ducoUsername");
@@ -66,17 +74,18 @@ public class MinerBackgroundService extends Service {
         Log.d("Mining service", "Mining service started");
 
         Intent notificationIntent = new Intent(this, ServiceNotificationActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         Notification notification = new NotificationCompat.Builder(this, "duinoCoinAndroidMinerChannel")
                 .setContentTitle("Duino Coin Android Miner")
                 .setContentText("The Miner is running in the background")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentIntent(pendingIntent)
-                .addAction(R.drawable.ic_launcher_foreground, "Button Title", pendingIntent)
+                .addAction(R.drawable.ic_launcher_foreground, "Stop mining", pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setTicker("The Miner is running")
                 .setOngoing(true)
+                .setOnlyAlertOnce(true)
                 .build();
 
         int type = 0;
@@ -93,7 +102,7 @@ public class MinerBackgroundService extends Service {
             Thread miningThread;
 
             try {
-                miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, t));
+                miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, t, this));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -132,5 +141,32 @@ public class MinerBackgroundService extends Service {
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public void newShareSent() {
+        sentShares++;
+    }
+
+    @Override
+    public void newShareAccepted() {
+        acceptedShares++;
+
+        acceptedPercentage = ((float) (acceptedShares / sentShares)) * 10000;
+        acceptedPercentage = Math.round(acceptedPercentage) / 100.0f;
+
+        Notification notification = new NotificationCompat.Builder(this, "duinoCoinAndroidMinerChannel")
+                .setContentTitle("Duino Coin Android Miner")
+                .setContentText("Mining: (" + acceptedShares + "/" + sentShares + ") - " + acceptedPercentage + "%")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentIntent(pendingIntent)
+                .addAction(R.drawable.ic_launcher_foreground, "Stop mining", pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setTicker("The Miner is running")
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .build();
+
+        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification);
     }
 }

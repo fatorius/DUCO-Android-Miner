@@ -9,8 +9,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
 import android.os.PowerManager;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -26,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MinerBackgroundService extends Service implements ServiceCommunicationMethods {
+    private static final int MINUTE_IN_MILLISECONDS = 60_000;
+
     private PowerManager.WakeLock wakeLock;
 
     List<Thread> miningThreads;
@@ -38,6 +44,7 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
 
     float acceptedPercentage = 0.0f;
 
+    long lastNotificationSent = 0;
 
     NotificationChannel channel;
     PendingIntent pendingIntent;
@@ -115,6 +122,17 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
             threadsHashrate.add(0);
         }
 
+        // In your background thread (e.g., in a service or a separate thread)
+        Handler backgroundHandler = new Handler(Looper.getMainLooper());
+
+        // Example: passing a string value
+        String messageText = "Hello from background thread!";
+        Message message = backgroundHandler.obtainMessage();
+        message.obj = messageText;
+
+        // Send the message to the main thread
+        backgroundHandler.sendMessage(message);
+
         if (wakeLock.isHeld()) {
             wakeLock.release();
         }
@@ -155,18 +173,24 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
         acceptedPercentage = ((float) (acceptedShares / sentShares)) * 10000;
         acceptedPercentage = Math.round(acceptedPercentage) / 100.0f;
 
-        Notification notification = new NotificationCompat.Builder(this, "duinoCoinAndroidMinerChannel")
-                .setContentTitle("Duino Coin Android Miner")
-                .setContentText("Mining: (" + acceptedShares + "/" + sentShares + ") - " + acceptedPercentage + "%")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentIntent(pendingIntent)
-                .addAction(R.drawable.ic_launcher_foreground, "Stop mining", pendingIntent)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setTicker("The Miner is running")
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .build();
+        long currentTime = SystemClock.elapsedRealtime();
 
-        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification);
+        if (currentTime - lastNotificationSent >= MINUTE_IN_MILLISECONDS){
+            Notification notification = new NotificationCompat.Builder(this, "duinoCoinAndroidMinerChannel")
+                    .setContentTitle("Duino Coin Android Miner")
+                    .setContentText("Mining: (" + acceptedShares + "/" + sentShares + ") - " + acceptedPercentage + "%")
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setContentIntent(pendingIntent)
+                    .addAction(R.drawable.ic_launcher_foreground, "Stop mining", pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setTicker("The Miner is running")
+                    .setOngoing(true)
+                    .setOnlyAlertOnce(true)
+                    .build();
+
+            NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification);
+        }
+
+        lastNotificationSent = currentTime;
     }
 }

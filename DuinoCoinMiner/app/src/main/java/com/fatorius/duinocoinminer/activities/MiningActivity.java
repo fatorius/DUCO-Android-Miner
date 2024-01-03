@@ -7,6 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -44,6 +47,8 @@ public class MiningActivity extends AppCompatActivity { //implements UIThreadMet
     Button stopMining;
 
     ProgressBar gettingPoolProgress;
+
+    Handler handler;
 
     String poolName;
     String poolIp;
@@ -168,11 +173,33 @@ public class MiningActivity extends AppCompatActivity { //implements UIThreadMet
 
         int miningIntensity = sharedPreferences.getInt("mining_intensity_value", 0);
 
+        handler = new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg){
+                System.out.println(msg.toString());
+            }
+        };
+
         efficiency = calculateEfficiency(miningIntensity);
 
         requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(getMiningPoolRequester);
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        Log.d("App", "Vortano");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        Log.d("App", "Pausano");
+    }
+
 
     /*
     @Override

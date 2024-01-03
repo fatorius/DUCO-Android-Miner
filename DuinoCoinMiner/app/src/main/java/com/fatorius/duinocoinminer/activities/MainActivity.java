@@ -10,6 +10,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         SharedPreferences sharedPreferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
         Intent insertDataIntent = new Intent(this, InsertDataActivity.class);

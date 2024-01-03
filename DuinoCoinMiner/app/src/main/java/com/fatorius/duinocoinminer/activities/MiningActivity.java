@@ -141,6 +141,10 @@ public class MiningActivity extends AppCompatActivity { //implements UIThreadMet
 
                     miningNodeDisplay.setText(errorMsg);
 
+                    String stopMiningNewText = "Back";
+
+                    stopMining.setText(stopMiningNewText);
+
                     stopMining.setOnClickListener(view -> {
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.clear();

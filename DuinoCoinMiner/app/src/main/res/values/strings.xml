@@ -3,7 +3,7 @@
     <string name="wallet_input_hint">Your username</string>
     <string name="mining_key_input_hint">Mining key (optional)</string>
     <string name="mining_threads_input_hint">Mining Threads</string>
-    <string name="mining_intensity_input_hint">Mining Intensity (0-100)</string>
+    <string name="mining_intensity_input_hint">Mining Intensity (0–100)</string>
     <string name="happy_mining">Happy mining!</string>
     <string name="stats">Stats</string>
     <string name="hashrate_title">Hashrate</string>
@@ -14,6 +14,9 @@
     <string name="accepted_shares_placeholder">Accepted shares: 0/0 (100%)</string>
     <string name="credits">Created by fatorius</string>
     <string name="start">Start</string>
+    <string name="warning">Warning</string>
+    <string name="continue_button">Continue</string>
     <string name="stop_mining_button">Stop mining</string>
     <string name="mining_intensity_starting_value">95</string>
+    <string name="warning_text">While the application is mining, it will maintain a background service responsible for keeping the miner running even if your phone\'s screen is turned off or if you are using other applications at the same time.  You can monitor your miner\'s performance and terminate the mining process at any time. Bear in mind that the mining process is fairly heavy in terms of CPU usage and power consumption, and keeping it running for a long time can drain your phone\'s battery quickly, as well as possibly raising its temperature. We don\'t know for sure what consequences or collateral damage this activity could cause to your device in the long term, especially if you use it to mine frequently. The app development team is not responsible for any damage that may result from the use of this app. By continuing, you declare yourself aware of and responsible for any collateral damage that this activity may cause to your device. Sincerely, the developers</string>
 </resources>

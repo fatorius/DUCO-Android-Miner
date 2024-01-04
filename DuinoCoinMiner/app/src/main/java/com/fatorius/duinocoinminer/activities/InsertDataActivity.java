@@ -26,7 +26,7 @@ public class InsertDataActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        Intent miningIntent = new Intent(this, MiningActivity.class);
+        Intent warningIntent = new Intent(this, WarningActivity.class);
 
         Button startButton = findViewById(R.id.startButton);
 
@@ -49,7 +49,7 @@ public class InsertDataActivity extends AppCompatActivity {
 
             editor.apply();
 
-            startActivity(miningIntent);
+            startActivity(warningIntent);
         });
 
         miningIntensityBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

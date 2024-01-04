@@ -9,11 +9,17 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Client {
+    String ip;
+    int port;
+
     Socket socket;
     PrintWriter socketSender;
     BufferedReader socketReader;
 
     public Client(String ip, int port) throws IOException {
+        this.ip = ip;
+        this.port = port;
+
         socket = new Socket(ip, port);
 
         socketSender = new PrintWriter(socket.getOutputStream(), true);
@@ -33,6 +39,11 @@ public class Client {
     public String readLine() throws IOException {
         String receivedMsg = socketReader.readLine();
 
+        if (receivedMsg == null){
+            this.restartConnection();
+            receivedMsg = "Connection restarted";
+        }
+
         Log.d("Received from socket", receivedMsg);
 
         return receivedMsg;
@@ -44,5 +55,21 @@ public class Client {
         socketReader.close();
 
         Log.d("Socket connection ended", "Connection exit");
+    }
+
+    public void restartConnection() throws IOException {
+        Log.d("Socket connection restarted", "Connection restarting");
+
+        socket.close();
+        socketSender.close();
+        socketReader.close();
+
+        socket = new Socket(ip, port);
+
+        socketSender = new PrintWriter(socket.getOutputStream(), true);
+        socketReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        send("PING");
+        socketReader.readLine();
     }
 }

@@ -5,14 +5,13 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.util.Log;
@@ -21,6 +20,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.fatorius.duinocoinminer.R;
+import com.fatorius.duinocoinminer.activities.MiningActivity;
 import com.fatorius.duinocoinminer.activities.ServiceNotificationActivity;
 import com.fatorius.duinocoinminer.threads.MiningThread;
 import com.fatorius.duinocoinminer.threads.ServiceCommunicationMethods;
@@ -28,9 +28,12 @@ import com.fatorius.duinocoinminer.threads.ServiceCommunicationMethods;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MinerBackgroundService extends Service implements ServiceCommunicationMethods {
-    private static final int MINUTE_IN_MILLISECONDS = 60_000;
+    public static final String ACTION_STOP_BACKGROUND_MINING = "com.fatorius.duinocoinminer.STOP_BACKGROUND_MINING";
+
+    private static final int NOTIFICATION_INTERVAL = 30_000;
 
     private PowerManager.WakeLock wakeLock;
 
@@ -42,7 +45,7 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
     int sentShares = 0;
     int acceptedShares = 0;
 
-    float acceptedPercentage = 0.0f;
+    float acceptedPercetage = 0.0f;
 
     long lastNotificationSent = 0;
 
@@ -54,6 +57,7 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
     @Override
     public void onCreate(){
         super.onCreate();
+
         channel = new NotificationChannel(
                 "duinoCoinAndroidMinerChannel",
                 "MinerServicesNotification",
@@ -68,6 +72,20 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        assert intent != null;
+        String action = intent.getAction();
+
+        if (MinerBackgroundService.ACTION_STOP_BACKGROUND_MINING.equals(action)) {
+            Log.d("Miner Service", "Finishing");
+
+            stopForegroundService();
+
+            stopForeground(true);
+            stopSelf();
+
+            return START_STICKY;
+        }
+
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "DuinoCoinMiner::MinerServiceWaveLock");
         wakeLock.acquire();
@@ -109,7 +127,7 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
             Thread miningThread;
 
             try {
-                miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, t, this));
+                miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, t, this), MiningThread.MINING_THREAD_NAME_ID);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -122,17 +140,6 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
             threadsHashrate.add(0);
         }
 
-        // In your background thread (e.g., in a service or a separate thread)
-        Handler backgroundHandler = new Handler(Looper.getMainLooper());
-
-        // Example: passing a string value
-        String messageText = "Hello from background thread!";
-        Message message = backgroundHandler.obtainMessage();
-        message.obj = messageText;
-
-        // Send the message to the main thread
-        backgroundHandler.sendMessage(message);
-
         if (wakeLock.isHeld()) {
             wakeLock.release();
         }
@@ -140,19 +147,29 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
         return START_STICKY;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
+    private void stopForegroundService() {
         Log.d("Mining service", "Mining service destroyed");
 
-        for (int t = 0; t < numberOfMiningThreads; t++){
-            miningThreads.get(t).interrupt();
+        Map<Thread, StackTraceElement[]> allThreads = Thread.getAllStackTraces();
+
+        for (Map.Entry<Thread, StackTraceElement[]> entry : allThreads.entrySet()) {
+            Thread thread = entry.getKey();
+
+            if (thread.getName().equals(MiningThread.MINING_THREAD_NAME_ID)){
+                thread.interrupt();
+            }
         }
 
         if (wakeLock != null && wakeLock.isHeld()) {
             wakeLock.release();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        stopForegroundService();
     }
 
     @Override
@@ -167,18 +184,29 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
     }
 
     @Override
-    public void newShareAccepted() {
+    public void newShareAccepted(int threadNo, int hashrate, float timeElapsed, int nonce) {
         acceptedShares++;
 
-        acceptedPercentage = ((float) (acceptedShares / sentShares)) * 10000;
-        acceptedPercentage = Math.round(acceptedPercentage) / 100.0f;
+        acceptedPercetage = (((float) acceptedShares / (float) sentShares)) * 10000;
+        acceptedPercetage = Math.round(acceptedPercetage) / 100.0f;
+
+        Intent intent = new Intent(MiningActivity.COMMUNICATION_ACTION);
+
+        intent.putExtra("threadNo", threadNo);
+        intent.putExtra("hashrate", hashrate);
+        intent.putExtra("timeElapsed", timeElapsed);
+        intent.putExtra("nonce", nonce);
+        intent.putExtra("sharesSent", sentShares);
+        intent.putExtra("sharesAccepted", acceptedShares);
+
+        sendBroadcast(intent);
 
         long currentTime = SystemClock.elapsedRealtime();
 
-        if (currentTime - lastNotificationSent >= MINUTE_IN_MILLISECONDS){
+        if (currentTime - lastNotificationSent >= NOTIFICATION_INTERVAL){
             Notification notification = new NotificationCompat.Builder(this, "duinoCoinAndroidMinerChannel")
                     .setContentTitle("Duino Coin Android Miner")
-                    .setContentText("Mining: (" + acceptedShares + "/" + sentShares + ") - " + acceptedPercentage + "%")
+                    .setContentText("Mining: (" + acceptedShares + "/" + sentShares + ") - " + acceptedPercetage + "%")
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
                     .setContentIntent(pendingIntent)
                     .addAction(R.drawable.ic_launcher_foreground, "Stop mining", pendingIntent)
@@ -189,8 +217,8 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
                     .build();
 
             NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification);
-        }
 
-        lastNotificationSent = currentTime;
+            lastNotificationSent = currentTime;
+        }
     }
 }

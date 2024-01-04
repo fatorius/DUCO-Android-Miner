@@ -14,6 +14,8 @@ public class MiningThread implements Runnable{
         System.loadLibrary("ducohasher");
     }
 
+    public final static String MINING_THREAD_NAME_ID = "duinocoin_mining_thread";
+
     String ip;
     int port;
 
@@ -26,8 +28,6 @@ public class MiningThread implements Runnable{
     DUCOS1Hasher hasher;
 
     float miningEfficiency;
-
-    //UIThreadMethods uiThreadMethods;
 
     ServiceCommunicationMethods service;
 
@@ -57,7 +57,7 @@ public class MiningThread implements Runnable{
                 throw new RuntimeException(e);
             }
 
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 tcpClient.send("JOB," + username + ",LOW");
 
                 try {
@@ -82,9 +82,7 @@ public class MiningThread implements Runnable{
 
                 Log.d("Thread " + threadNo + " | Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
 
-                //uiThreadMethods.sendHashrate(threadNo, (int) hashrate);
                 service.newShareSent();
-                //uiThreadMethods.sendNewLineFromMiner("Thread " + threadNo + " | Nonce found: " + nonce + " | Time elapsed: " + timeElapsed + "s | Hashrate: " + (int) hashrate);
 
                 tcpClient.send(nonce + "," + (int) hashrate + "," + MinerInfo.MINER_NAME + "," + Build.MODEL);
 
@@ -96,7 +94,7 @@ public class MiningThread implements Runnable{
                 }
 
                 if (shareResult.contains("GOOD")) {
-                    service.newShareAccepted();
+                    service.newShareAccepted(threadNo, (int) hashrate, timeElapsed, nonce);
                 }
 
                 Log.d("Share accepted", shareResult);

@@ -33,6 +33,8 @@
         <activity
             android:name=".activities.InsertDataActivity"
             android:exported="false" />
+        <activity android:name=".activities.ServiceNotificationActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.MainActivity"
             android:exported="true" >

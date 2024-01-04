@@ -1,18 +1,21 @@
 package com.fatorius.duinocoinminer.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.fatorius.duinocoinminer.services.MinerBackgroundService;
 
 public class ServiceNotificationActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-        handleNotificationAction();
-    }
+        Intent intent = new Intent(this, MinerBackgroundService.class);
+        intent.setAction(MinerBackgroundService.ACTION_STOP_BACKGROUND_MINING);
+        startService(intent);
 
-    private void handleNotificationAction(){
-        android.os.Process.killProcess(android.os.Process.myPid());
+        finish();
     }
 }

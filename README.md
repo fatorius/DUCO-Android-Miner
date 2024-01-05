@@ -7,7 +7,7 @@
 This repository contains the source code for my Duino Coin mining app for android. The aim in developing this application was to create a more practical way of mining cryptocurrency on a mobile phone, without having to use the web miner, which usually had its Javascript interrupted by putting the browser in the background or turning off the screen.
 
 Most of the source code is written in Java, but the SHA1 function is executed in native code, written in C++ from Volker Diels-Grabsch's implementation, with the aim of increasing the number of hashes per second.
-I haven't made a comparison with the SHA1 functions written directly in Java to find out the real increase in the miner's performance (But I'll probably do them soon).
+I haven't made a comparison with the SHA1 functions written directly in Java to find out the real increase in the miner's performance.
 
 The miner has the option of running several mining threads based on the number of cores available on his device, solving several jobs at the same time.
 

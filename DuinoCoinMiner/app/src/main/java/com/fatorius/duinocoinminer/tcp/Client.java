@@ -7,8 +7,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Client {
-    String ip;
-    int port;
+    final String ip;
+    final int port;
 
     Socket socket;
     PrintWriter socketSender;

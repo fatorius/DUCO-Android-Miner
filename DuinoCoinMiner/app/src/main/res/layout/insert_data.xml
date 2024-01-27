@@ -27,7 +27,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         app:layout_constraintVertical_bias="0.024"
-        app:srcCompat="@drawable/duco_logo" />
+        app:srcCompat="@drawable/duco_logo"
+        android:importantForAccessibility="no" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -50,7 +51,8 @@
             android:inputType="text"
             android:textColorHighlight="@color/magenta_accent"
             android:textColorLink="@color/magenta_accent"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:importantForAutofill="no" />
 
         <View
             android:id="@+id/view"
@@ -65,7 +67,8 @@
             android:ems="10"
             android:hint="@string/mining_key_input_hint"
             android:inputType="text"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:importantForAutofill="no" />
 
         <View
             android:id="@+id/view2"
@@ -122,7 +125,8 @@
             android:ems="10"
             android:hint="@string/mining_threads_input_hint"
             android:inputType="number"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:importantForAutofill="no" />
     </LinearLayout>
 
     <TextView

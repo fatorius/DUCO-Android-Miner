@@ -19,8 +19,6 @@ public class WarningActivity extends AppCompatActivity {
 
         Button continueButton = findViewById(R.id.continueButtonFromWarning);
 
-        continueButton.setOnClickListener(view -> {
-            startActivity(miningIntent);
-        });
+        continueButton.setOnClickListener(view -> startActivity(miningIntent));
     }
 }

@@ -30,7 +30,7 @@ import java.util.Locale;
 
 public class MiningActivity extends AppCompatActivity { //implements UIThreadMethods {
     RequestQueue requestQueue;
-    JsonObjectRequest getMiningPoolRequester;
+    final JsonObjectRequest getMiningPoolRequester;
 
     TextView miningNodeDisplay;
     TextView acceptedSharesTextDisplay;
@@ -56,8 +56,8 @@ public class MiningActivity extends AppCompatActivity { //implements UIThreadMet
 
     float acceptedPercetage;
 
-    List<String> minerLogLines;
-    List<Integer> threadsHashrate;
+    final List<String> minerLogLines;
+    final List<Integer> threadsHashrate;
 
     SharedPreferences sharedPreferences;
 

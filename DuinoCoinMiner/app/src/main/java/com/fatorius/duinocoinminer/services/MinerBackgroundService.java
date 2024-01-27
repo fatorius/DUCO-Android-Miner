@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -74,8 +73,6 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
         String action = intent.getAction();
 
         if (MinerBackgroundService.ACTION_STOP_BACKGROUND_MINING.equals(action)) {
-            Log.d("Miner Service", "Finishing");
-
             stopForegroundService();
 
             stopForeground(true);
@@ -93,8 +90,6 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
         numberOfMiningThreads = intent.getIntExtra("numberOfThreads", 0);
         int poolPort = intent.getIntExtra("poolPort", 0);
         float efficiency = intent.getFloatExtra("efficiency", 0);
-
-        Log.d("Mining service", "Mining service started");
 
         Intent notificationIntent = new Intent(this, ServiceNotificationActivity.class);
         pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
@@ -146,8 +141,6 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
     }
 
     private void stopForegroundService() {
-        Log.d("Mining service", "Mining service destroyed");
-
         Map<Thread, StackTraceElement[]> allThreads = Thread.getAllStackTraces();
 
         for (Map.Entry<Thread, StackTraceElement[]> entry : allThreads.entrySet()) {

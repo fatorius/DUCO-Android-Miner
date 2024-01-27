@@ -1,7 +1,6 @@
 package com.fatorius.duinocoinminer.threads;
 
 import android.os.Build;
-import android.util.Log;
 
 import com.fatorius.duinocoinminer.algorithms.DUCOS1Hasher;
 import com.fatorius.duinocoinminer.infos.MinerInfo;
@@ -40,14 +39,10 @@ public class MiningThread implements Runnable{
         this.threadNo = threadNo;
 
         hasher = new DUCOS1Hasher();
-
-        Log.d("Mining thread" + threadNo, threadNo + " created");
     }
 
     @Override
     public void run() {
-        Log.d("Mining thread" + threadNo, threadNo + " started");
-
         try {
             String responseData;
 
@@ -66,8 +61,6 @@ public class MiningThread implements Runnable{
                     throw new RuntimeException(e);
                 }
 
-                Log.d("Thread " + threadNo + " | JOB received", responseData);
-
                 String[] values = responseData.split(",");
 
                 String lastBlockHash = values[0];
@@ -79,8 +72,6 @@ public class MiningThread implements Runnable{
 
                 float timeElapsed = hasher.getTimeElapsed();
                 float hashrate = hasher.getHashrate();
-
-                Log.d("Thread " + threadNo + " | Nonce found", nonce + " Time elapsed: " + timeElapsed + "s Hashrate: " + (int) hashrate);
 
                 service.newShareSent();
 
@@ -96,8 +87,6 @@ public class MiningThread implements Runnable{
                 if (shareResult.contains("GOOD")) {
                     service.newShareAccepted(threadNo, (int) hashrate, timeElapsed, nonce);
                 }
-
-                Log.d("Share accepted", shareResult);
             }
         }
         catch (RuntimeException e){
@@ -106,9 +95,7 @@ public class MiningThread implements Runnable{
         finally {
             try {
                 tcpClient.closeConnection();
-                Log.d("Mining thread " + threadNo, "Thread " + threadNo + " interrupted");
-            } catch (IOException e) {
-                Log.w("Miner thread", "Couldn't properly end socket connection");
+            } catch (IOException ignored) {
             }
         }
     }

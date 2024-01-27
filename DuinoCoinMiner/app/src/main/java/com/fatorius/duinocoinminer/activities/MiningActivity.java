@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -140,8 +139,6 @@ public class MiningActivity extends AppCompatActivity { //implements UIThreadMet
                             errorMsg = "Error: server.duinocoin.com internal error";
                             break;
                     }
-
-                    Log.i("Resquest error", error.toString());
 
                     miningNodeDisplay.setText(errorMsg);
 

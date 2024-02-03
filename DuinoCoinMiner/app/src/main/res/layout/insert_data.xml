@@ -159,7 +159,15 @@
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/credits" />
+                android:text="@string/credits"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/version_text"
+                android:textAlignment="center" />
 
             <Space
                 android:layout_width="match_parent"

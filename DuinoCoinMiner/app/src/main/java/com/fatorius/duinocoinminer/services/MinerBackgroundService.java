@@ -86,9 +86,14 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
         wakeLock.acquire();
 
         String poolIp = intent.getStringExtra("poolIp");
+
         String ducoUsername = intent.getStringExtra("ducoUsername");
+        String ducoMiningKey = intent.getStringExtra("ducoMiningKey");
+
         numberOfMiningThreads = intent.getIntExtra("numberOfThreads", 0);
+
         int poolPort = intent.getIntExtra("poolPort", 0);
+
         float efficiency = intent.getFloatExtra("efficiency", 0);
 
         Intent notificationIntent = new Intent(this, ServiceNotificationActivity.class);
@@ -120,7 +125,7 @@ public class MinerBackgroundService extends Service implements ServiceCommunicat
             Thread miningThread;
 
             try {
-                miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, efficiency, t, this), MiningThread.MINING_THREAD_NAME_ID);
+                miningThread = new Thread(new MiningThread(poolIp, poolPort, ducoUsername, ducoMiningKey, efficiency, t, this), MiningThread.MINING_THREAD_NAME_ID);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

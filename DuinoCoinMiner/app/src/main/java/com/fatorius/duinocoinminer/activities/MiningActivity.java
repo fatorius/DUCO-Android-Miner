@@ -48,6 +48,7 @@ public class MiningActivity extends AppCompatActivity { //implements UIThreadMet
     String poolServerName;
 
     String ducoUsername;
+    String miningKey;
     float efficiency;
     int numberOfMiningThreads;
 
@@ -102,6 +103,7 @@ public class MiningActivity extends AppCompatActivity { //implements UIThreadMet
                     miningServiceIntent.putExtra("numberOfThreads", numberOfMiningThreads);
                     miningServiceIntent.putExtra("poolPort", poolPort);
                     miningServiceIntent.putExtra("ducoUsername", ducoUsername);
+                    miningServiceIntent.putExtra("ducoMiningKey", miningKey);
                     miningServiceIntent.putExtra("efficiency", efficiency);
 
                     miningActivity.startForegroundService(miningServiceIntent);
@@ -174,6 +176,7 @@ public class MiningActivity extends AppCompatActivity { //implements UIThreadMet
 
         sharedPreferences = getSharedPreferences("com.fatorius.duinocoinminer", MODE_PRIVATE);
         ducoUsername = sharedPreferences.getString("username_value", "---------------------");
+        miningKey = sharedPreferences.getString("mining_key_value", "");
         numberOfMiningThreads = sharedPreferences.getInt("threads_value", 1);
 
         for (int t = 0; t < numberOfMiningThreads; t++){

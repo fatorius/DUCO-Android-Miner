@@ -7,6 +7,7 @@ import com.fatorius.duinocoinminer.infos.MinerInfo;
 import com.fatorius.duinocoinminer.tcp.Client;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class MiningThread implements Runnable{
     static{
@@ -23,6 +24,8 @@ public class MiningThread implements Runnable{
     Client tcpClient;
 
     String username;
+    String miningKey;
+
 
     DUCOS1Hasher hasher;
 
@@ -30,11 +33,12 @@ public class MiningThread implements Runnable{
 
     ServiceCommunicationMethods service;
 
-    public MiningThread(String ip, int port, String username, float miningEfficiency, int threadNo, ServiceCommunicationMethods service) throws IOException {
+    public MiningThread(String ip, int port, String username, String miningKey, float miningEfficiency, int threadNo, ServiceCommunicationMethods service) throws IOException {
         this.ip = ip;
         this.port = port;
         this.username = username;
         this.miningEfficiency = miningEfficiency;
+        this.miningKey = miningKey;
         this.service = service;
         this.threadNo = threadNo;
 
@@ -53,7 +57,12 @@ public class MiningThread implements Runnable{
             }
 
             while (!Thread.currentThread().isInterrupted()) {
-                tcpClient.send("JOB," + username + ",LOW");
+                if (Objects.equals(miningKey, "")){
+                    tcpClient.send("JOB," + username + ",LOW");
+                }
+                else{
+                    tcpClient.send("JOB," + username + ",LOW,"+miningKey);
+                }
 
                 try {
                     responseData = tcpClient.readLine();

@@ -6,155 +6,166 @@
     android:layout_height="match_parent"
     tools:context=".activities.InsertDataActivity">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textSize="28sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.053" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="111dp"
-        android:layout_height="87dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:layout_constraintVertical_bias="0.024"
-        app:srcCompat="@drawable/duco_logo"
-        android:importantForAccessibility="no" />
-
-    <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="336dp"
-        android:layout_height="387dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        app:layout_constraintVertical_bias="0.204">
-
-        <EditText
-            android:id="@+id/yourNameInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/wallet_input_hint"
-            android:inputType="text"
-            android:textColorHighlight="@color/magenta_accent"
-            android:textColorLink="@color/magenta_accent"
-            android:textSize="20sp"
-            android:importantForAutofill="no" />
-
-        <View
-            android:id="@+id/view"
-            android:layout_width="match_parent"
-            android:layout_height="30dp" />
-
-        <EditText
-            android:id="@+id/miningKeyInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:ems="10"
-            android:hint="@string/mining_key_input_hint"
-            android:inputType="text"
-            android:textSize="20sp"
-            android:importantForAutofill="no" />
-
-        <View
-            android:id="@+id/view2"
-            android:layout_width="match_parent"
-            android:layout_height="30dp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="vertical">
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+
             <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/mining_intensity_input_hint"
-                android:textColor="#878787"
-                android:textSize="16sp" />
+                android:id="@+id/textView2"
+                android:layout_width="407dp"
+                android:layout_height="55dp"
+                android:text="@string/app_name"
+                android:textAlignment="center"
+                android:textSize="28sp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="30dp" />
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="111dp"
+                android:layout_height="87dp"
+                android:importantForAccessibility="no"
+                app:srcCompat="@drawable/duco_logo" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="30dp" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:id="@+id/linearLayout"
+                android:layout_width="336dp"
+                android:layout_height="387dp"
+                android:orientation="vertical">
 
-                <SeekBar
-                    android:id="@+id/miningIntensityInput"
-                    style="@style/Widget.AppCompat.SeekBar.Discrete"
-                    android:layout_width="270dp"
-                    android:layout_height="45dp"
-                    android:layout_marginTop="10dp"
-                    android:max="100"
-                    android:progress="95" />
-
-                <TextView
-                    android:id="@+id/intensityDisplay"
-                    android:layout_width="49dp"
+                <EditText
+                    android:id="@+id/yourNameInput"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/mining_intensity_starting_value"
-                    android:textAlignment="center"
+                    android:ems="10"
+                    android:hint="@string/wallet_input_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:textColorHighlight="@color/magenta_accent"
+                    android:textColorLink="@color/magenta_accent"
+                    android:textSize="20sp" />
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp" />
+
+                <EditText
+                    android:id="@+id/miningKeyInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:ems="10"
+                    android:hint="@string/mining_key_input_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:textSize="20sp" />
+
+                <View
+                    android:id="@+id/view2"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/mining_intensity_input_hint"
+                        android:textColor="#878787"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <SeekBar
+                            android:id="@+id/miningIntensityInput"
+                            style="@style/Widget.AppCompat.SeekBar.Discrete"
+                            android:layout_width="270dp"
+                            android:layout_height="45dp"
+                            android:layout_marginTop="10dp"
+                            android:max="100"
+                            android:progress="95" />
+
+                        <TextView
+                            android:id="@+id/intensityDisplay"
+                            android:layout_width="49dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/mining_intensity_starting_value"
+                            android:textAlignment="center"
+                            android:textSize="20sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/view3"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp" />
+
+                <EditText
+                    android:id="@+id/miningThreadsInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="248dp"
+                    android:ems="10"
+                    android:hint="@string/mining_threads_input_hint"
+                    android:importantForAutofill="no"
+                    android:inputType="number"
                     android:textSize="20sp" />
             </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/startButton"
+                android:layout_width="169dp"
+                android:layout_height="56dp"
+                android:background="@color/orange_accent"
+                android:backgroundTint="@color/orange_accent"
+                android:text="@string/start"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                app:cornerRadius="30sp" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/credits" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="50dp" />
+
         </LinearLayout>
-
-        <View
-            android:id="@+id/view3"
-            android:layout_width="match_parent"
-            android:layout_height="30dp" />
-
-        <EditText
-            android:id="@+id/miningThreadsInput"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginBottom="248dp"
-            android:ems="10"
-            android:hint="@string/mining_threads_input_hint"
-            android:inputType="number"
-            android:textSize="20sp"
-            android:importantForAutofill="no" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/credits"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.957" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/startButton"
-        android:layout_width="115dp"
-        android:layout_height="53dp"
-        android:background="@color/orange_accent"
-        android:backgroundTint="@color/orange_accent"
-        android:text="@string/start"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
-        app:cornerRadius="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="0.0" />
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

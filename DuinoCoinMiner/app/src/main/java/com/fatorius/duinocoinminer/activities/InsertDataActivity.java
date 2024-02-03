@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,9 +42,22 @@ public class InsertDataActivity extends AppCompatActivity {
         SeekBar miningIntensityBar = findViewById(R.id.miningIntensityInput);
 
         startButton.setOnClickListener(view -> {
-            editor.putString("username_value", yourNameInput.getText().toString().strip());
+            String yourNameInputText = yourNameInput.getText().toString().strip();
+
+            if (yourNameInputText.equals("")){
+                yourNameInput.setHintTextColor(Color.RED);
+                yourNameInput.setTextColor(Color.RED);
+                return;
+            }
+
+            String miningThreadsInputText = miningThreadsInput.getText().toString();
+            if (miningThreadsInputText.equals("")){
+                miningThreadsInputText = "4";
+            }
+
+            editor.putString("username_value", yourNameInputText);
             editor.putString("mining_key_value", miningKeyInput.getText().toString().strip());
-            editor.putInt("threads_value", Integer.parseInt(miningThreadsInput.getText().toString()));
+            editor.putInt("threads_value", Integer.parseInt(miningThreadsInputText));
             editor.putInt("mining_intensity_value", miningIntensityBar.getProgress());
             editor.putBoolean("isThereDataSaved", true);
 

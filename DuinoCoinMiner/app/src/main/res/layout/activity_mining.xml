@@ -182,14 +182,18 @@
                 app:layout_constraintTop_toBottomOf="@+id/stopMiningButton"
                 app:layout_constraintVertical_bias="0.0" />
 
+            <!--ca-app-pub-9398795544358058/5734856999-->
             <com.google.android.gms.ads.AdView
-                android:id="@+id/adView2"
+                xmlns:ads="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/mining_ad_view"
                 android:layout_width="409dp"
                 android:layout_height="99dp"
                 android:layout_marginTop="14dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                ads:adSize="BANNER"
+                ads:adUnitId="ca-app-pub-3940256099942544/6300978111"
                 app:layout_constraintTop_toBottomOf="@+id/space" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

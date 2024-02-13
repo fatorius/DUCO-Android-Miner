@@ -17,6 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DuinoCoinMiner"
         tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9398795544358058~1276150505"/>
+
         <activity
             android:name=".activities.WarningActivity"
             android:exported="false" />

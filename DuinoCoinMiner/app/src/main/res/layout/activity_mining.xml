@@ -18,7 +18,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/textView3"
@@ -33,20 +33,6 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.023" />
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="126dp"
-                android:layout_height="126dp"
-                android:layout_marginTop="12dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.498"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView3"
-                app:layout_constraintVertical_bias="0.0"
-                app:srcCompat="@drawable/newwebminer"
-                android:importantForAccessibility="no" />
-
             <LinearLayout
                 android:id="@+id/linearLayout2"
                 android:layout_width="280dp"
@@ -56,8 +42,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.496"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView2"
-                app:layout_constraintVertical_bias="0.037">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.25">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -138,10 +124,9 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <LinearLayout
+                    <Space
                         android:layout_width="match_parent"
-                        android:layout_height="20sp"
-                        android:orientation="horizontal" />
+                        android:layout_height="20sp" />
 
                     <TextView
                         android:id="@+id/textView9"
@@ -171,19 +156,42 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/stopMiningButton"
-                android:layout_width="132dp"
-                android:layout_height="52dp"
+                android:layout_width="178dp"
+                android:layout_height="54dp"
                 android:layout_marginTop="24dp"
                 android:background="@color/orange_accent"
                 android:backgroundTint="@color/orange_accent"
                 android:text="@string/stop_mining_button"
-                android:textColor="#FBFAFA"
-                android:textSize="16sp"
+                android:textColor="#000000"
+                android:textSize="18sp"
                 app:cornerRadius="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
+            <Space
+                android:id="@+id/space"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_marginBottom="1dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/stopMiningButton"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <com.google.android.gms.ads.AdView
+                android:id="@+id/adView2"
+                android:layout_width="409dp"
+                android:layout_height="99dp"
+                android:layout_marginTop="14dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/space" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

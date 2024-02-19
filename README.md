@@ -13,7 +13,6 @@ The miner has the option of running several mining threads based on the number o
 
 On my phone, a Xiaomi Redmi Note 11, each thread performs at around 100,000 hashes per second.
 
-[This app was published on the Google Play Store.](https://play.google.com/store/apps/details?id=com.fatorius.duinocoinminer)
 
 ### Screenshots
 
